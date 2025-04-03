@@ -1,5 +1,45 @@
 # Simulating HAIs
 George G. Vega Yon, Ph.D.
+2025-04-03
+
+## Idea of a model
+
+1.  We train a deep neural network (DNN) to predict the latent state of
+    a patient. We can do this using EHR data and clinical cultures as
+    input. The model will predict the latent state (surveillance data).
+
+2.  Then, instead of using the existing Bayesian transmission model (in
+    which we simulate the latent states as augmented data,) we use the
+    latent state predicted by the DNN as input to the mechanistic model.
+
+3.  The Bayesian model will still use the clinical cultures as input,
+    but the latent state will be predicted by the DNN, not simulated on
+    the fly.
+
+4.  The mechanistic model can still be used directly to do inferences
+    about the transmission and importation parameters.
+
+``` mermaid
+flowchart LR
+  ehr[EHR data]
+  cultures[Clinical<br>cultures data]
+  surveillance[Surveillance<br>data]
+  mechmodel((Mechanistic<br>model))
+  deepnn((Deep<br>neural network))
+
+  latentstates[Latent<br>states]
+
+  surveillance -->|Used as|latentstates
+
+  cultures -->|Input|deepnn
+  ehr -->|Input|deepnn
+  deepnn -->|Predicts|latentstates
+
+  latentstates -->|Input|mechmodel
+  cultures -->|Input|mechmodel
+
+  mechmodel -->|Output|Parameters
+```
 
 ## Mathematical description of the model
 
@@ -250,14 +290,14 @@ ans
 ```
 
     $par
-    [1]  0.03738572 -3.00481958 -3.88172378 -3.72528890
+    [1]  0.08028953 -1.20631209 -3.92108065 -6.67665030
 
     $value
-    [1] -23.50903
+    [1] -28.12947
 
     $counts
     function gradient 
-          21       21 
+          36       36 
 
     $convergence
     [1] 0
@@ -281,7 +321,7 @@ cbind(
 
 |                | Estimated |   True |
 |:---------------|----------:|-------:|
-| crate          |    1.0381 | 0.7857 |
-| t_rate         |    0.0472 | 0.2000 |
-| false_positive |    0.0202 | 0.0500 |
-| false_negative |    0.0235 | 0.0500 |
+| crate          |    1.0836 | 0.7857 |
+| t_rate         |    0.2304 | 0.2000 |
+| false_positive |    0.0194 | 0.0500 |
+| false_negative |    0.0013 | 0.0500 |

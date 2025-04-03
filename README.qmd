@@ -5,6 +5,38 @@ author: George G. Vega Yon, Ph.D.
 date: 2025-04-03
 ---
 
+## Idea of a model
+
+1. We train a deep neural network (DNN) to predict the latent state of a patient. We can do this using EHR data and clinical cultures as input. The model will predict the latent state (surveillance data).
+
+2. Then, instead of using the existing Bayesian transmission model (in which we simulate the latent states as augmented data,) we use the latent state predicted by the DNN as input to the mechanistic model. 
+
+3. The Bayesian model will still use the clinical cultures as input, but the latent state will be predicted by the DNN, not simulated on the fly.
+
+4. The mechanistic model can still be used directly to do inferences about the transmission and importation parameters.
+
+```{mermaid}
+flowchart LR
+  ehr[EHR data]
+  cultures[Clinical<br>cultures data]
+  surveillance[Surveillance<br>data]
+  mechmodel((Mechanistic<br>model))
+  deepnn((Deep<br>neural network))
+
+  latentstates[Latent<br>states]
+
+  surveillance -->|Used as|latentstates
+
+  cultures -->|Input|deepnn
+  ehr -->|Input|deepnn
+  deepnn -->|Predicts|latentstates
+
+  latentstates -->|Input|mechmodel
+  cultures -->|Input|mechmodel
+
+  mechmodel -->|Output|Parameters
+```
+
 ## Mathematical description of the model
 
 Let $s_{ij}$ be the result of a test given to patient $i$ in time $j$, $\{\xi_p, \xi_n\}$ be the false positive and negative rates, respectively, and $a_i$ be the latent state of the patient $i$, equal to one if the patient is positive.
